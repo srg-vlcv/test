@@ -17,9 +17,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Link href="/create" className="button primary">
               Create+
             </Link>
-            <button className="button secondary" onClick={() => alert('Rating clicked!')}>
-              Rating
-            </button>
           </div>
         </div>
       </header>

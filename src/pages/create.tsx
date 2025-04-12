@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 const CreatePage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [error, setError] = useState('');
 
   const router = useRouter();
 
@@ -16,64 +17,74 @@ const CreatePage: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (title.trim() === '' || content.trim() === '') {
-      alert('Please enter both title and content.');
+    setError(''); // Clear previous errors
+
+    if (title.trim() === '' && content.trim() === '') {
+      setError('Пожалуйста, введите заголовок и содержание.');
       return;
-    }
+    } 
+    if (title.trim() === '') {
+      setError('Пожалуйста, введите заголовок.');
+    } else if (content.trim() === '') {
+      setError('Пожалуйста, введите содержание.');
+    } else { // No errors, proceed with saving
+        setError(''); // Clear any existing error message
+        const newsId = generateId();
+        const newNews = {
+          id: newsId,
+          title: title,
+          content: content,
+          dateCreated: new Date().toISOString(),
+          rating: 0,
+          votes: 0,
+          comments: [],
+        };
 
-    const newsId = generateId();
-    const newNews = {
-      id: newsId,
-      title: title,
-      content: content,
-      dateCreated: new Date().toISOString(),
-      rating: 0,
-      votes: 0,
-      comments: [],
-    };
+        const existingNews = localStorage.getItem('news');
+        const news = existingNews ? JSON.parse(existingNews) : [];
+        news.push(newNews);
+        localStorage.setItem('news', JSON.stringify(news));
 
-    const existingNews = localStorage.getItem('news');
-    const news = existingNews ? JSON.parse(existingNews) : [];
-    news.push(newNews);
-    localStorage.setItem('news', JSON.stringify(news));
-
-    router.push('/');
+        router.push('/');
+    }   
   };
 
+  
   return (
     <Layout>
       <div className="relative p-6">
           <BackButton />
           <div className="frosted-glass p-6 my-8">
-            <h1 className="text-3xl font-bold mb-4">Create New News</h1>
+            <h1 className="text-3xl font-bold mb-4">Создать новость</h1>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
-                  Title (max 50 chars):
+                  Заголовок (макс. 50 символов):
                 </label>
                 <input
                   type="text"
                   id="title"
                   name="title"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                   maxLength={50}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
               <div className="mb-6">
                 <label htmlFor="content" className="block text-gray-700 text-sm font-bold mb-2">
-                  Content:
+                  Содержание:
                 </label>
                 <textarea
                   id="content"
                   name="content"
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
                 />
               </div>
-              <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit</button>
+              <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Отправить</button>
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             </form>
           </div>
         </div>
