@@ -75,7 +75,7 @@ const HomePage: React.FC = () => {
         {/* Footer */}
         <footer className="frosted-glass py-4 mt-8">
           <div className="container mx-auto flex justify-between items-center">
-            <p>&copy; 2023 Neuro-wire. All rights reserved.</p>
+            <p>&copy; 2025 Neuro-wire. Все права защищены.</p>
             {/* Add social media links here */}
             <div className="flex space-x-4">
               <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>

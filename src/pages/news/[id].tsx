@@ -31,7 +31,7 @@ const NewsPage: React.FC = () => {
     const commentText = event.currentTarget.comment.value;
 
     if (commentText.trim() === '') {
-      alert('Please enter a comment.');
+      alert('Пожалуйста, введите комментарий.');
       return;
     }
 
@@ -81,34 +81,34 @@ const NewsPage: React.FC = () => {
             {newsItem.title}
           </h1>
           <p className="text-gray-600 mb-2">
-            Published: {new Date(newsItem.dateCreated).toLocaleDateString()}
+            Опубликовано: {new Date(newsItem.dateCreated).toLocaleDateString()}
           </p>
           <p className="text-gray-800">{newsItem.content}</p>
-          <p className="mt-4">Rating: {newsItem.rating}</p>
+          <p className="mt-4">Рейтинг: {newsItem.rating}</p>
 
           {/* Comments Section */}
           <div className="mt-8 ">
-            <h2 className="text-2xl font-bold mb-4">Comments</h2>
+            <h2 className="text-2xl font-bold mb-4">Комментарии</h2>
 
-            {/* Comment Form */}
+            {/* Comment Form  */}
             <form onSubmit={handleSubmitComment} className="mb-6">
               <div className="mb-2">
                 <textarea
                   id="comment"
                   name="comment"
-                  placeholder="Write your comment..."
+                  placeholder="Напишите свой комментарий..."
                   className="w-full h-24 p-2 border rounded"
                   required
                 />
               </div>
               <button type="submit" className="button primary">
-                Submit Comment
+                Отправить комментарий
               </button>
             </form>
 
             {/* Display Comments */}
             {newsItem.comments && newsItem.comments.length > 0 ? (
-              <ul>
+             <ul>
                 {newsItem.comments.map(comment => (
                   <li key={comment.id} className="mb-4 p-4 bg-gray-50 rounded-lg shadow-sm">
                     <p className="font-semibold">
@@ -119,13 +119,13 @@ const NewsPage: React.FC = () => {
                 ))}
               </ul>
             ) : (
-              <p>No comments yet. Be the first to comment!</p>
+              <p>Пока нет комментариев. Будьте первым, кто прокомментирует!</p>
             )}
           </div>
         </main>
         <footer className="frosted-glass py-4 mt-8">
           <div className="container mx-auto flex justify-between items-center">
-            <p>&copy; 2023 Neuro-wire. All rights reserved.</p>
+            <p>&copy; 2025 Neuro-wire. Все права защищены.</p>
             {/* Add social media links here */}
             <div className="flex space-x-4">
               <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
