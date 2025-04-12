@@ -6,7 +6,51 @@
 @tailwind utilities;
 
 body {
-  
+  font-family: 'Inter', sans-serif; /* Or another font if you're using one */
+  background-color: var(--background-color); /* Or another background color */
+}
+
+:root {
+  --background-color: #f8f9fa; /* Example background color, change if needed */
+}
+
+html {
+  min-height: 100vh;
+}
+
+.main-header {
+  background-color: #f8f9fa; /* Header background color */
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.main-header .container  {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+main {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.main-footer {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+.main-footer .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-container {
+ max-width: 1200px;
+ margin: 0 auto;
+ padding: 0 1rem;
 }
 
 button {

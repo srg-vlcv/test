@@ -47,42 +47,44 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen ">
-      <header className="frosted-glass py-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-2xl font-serif font-semibold">
-            Neuro-wire
-          </Link>
-          <div>
-            <Link href="/create" className="button primary">
-              Create+
+    <div className="min-h-screen">
+      <div className="page-container">
+        <header className="frosted-glass py-4">
+          <div className="container mx-auto flex justify-between items-center">
+            <Link href="/" className="text-2xl font-serif font-semibold">
+              Neuro-wire
             </Link>
-            <button onClick={clearNews} className="button secondary">
-              Очистить новости
-            </button>
+            <div>
+              <Link href="/create" className="button primary">
+                Create+
+              </Link>
+              <button onClick={clearNews} className="button secondary">
+                Очистить новости
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto py-8">
-        <div className="p-6">
-          <NewsList news={news} onVote={handleVote} />
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="frosted-glass py-4 mt-8">
-        <div className="container mx-auto flex justify-between items-center">
-          <p>&copy; 2023 Neuro-wire. All rights reserved.</p>
-          {/* Add social media links here */}
-          <div className="flex space-x-4">
-            <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
-            <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+        {/* Main Content */}
+        <main className="container mx-auto py-8">
+          <div className="p-6">
+            <NewsList news={news} onVote={handleVote} />
           </div>
-        </div>
-      </footer>
+        </main>
+
+        {/* Footer */}
+        <footer className="frosted-glass py-4 mt-8">
+          <div className="container mx-auto flex justify-between items-center">
+            <p>&copy; 2023 Neuro-wire. All rights reserved.</p>
+            {/* Add social media links here */}
+            <div className="flex space-x-4">
+              <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
+              <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
+              <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+            </div>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };
