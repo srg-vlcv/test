@@ -8,18 +8,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="frosted-glass py-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-2xl font-serif font-semibold">
-            Neuro-wire
-          </Link>
-          <div>
-            <Link href="/create" className="button primary">
-              Create+
-            </Link>
-          </div>
-        </div>
-      </header>
+      
 
       <main className="container mx-auto py-8">
         {children}
@@ -27,11 +16,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <footer className="frosted-glass py-4 mt-8">
         <div className="container mx-auto flex justify-between items-center">
-          <p>&copy; 2023 Neuro-wire. All rights reserved.</p>
+          <p>&copy; 2025 Neuro-wire. All rights reserved.</p>
           <div className="flex space-x-4">
-            <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
-            <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://dzen.ru/neurowire" target="_blank" rel="noopener noreferrer">
+              <img src="/dzen.svg" alt="Dzen" width="34" height="34" />
+            </a>
+            <a href="https://vk.com/neurowire" target="_blank" rel="noopener noreferrer">
+              <img src="/vk.svg" alt="VK" width="34" height="34" />
+            </a>
+            <a href="https://t.me/neurowire" target="_blank" rel="noopener noreferrer">
+              <img src="/tg.svg" alt="Telegram" width="34" height="34" />
+            </a>
           </div>
         </div>
       </footer>

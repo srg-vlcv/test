@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 import Link from "next/link";
 import BackButton from '../components/BackButton';
+import Layout from '../components/Layout';
 
 const CreatePage: React.FC = () => {
   const [title, setTitle] = useState('');
@@ -51,70 +52,60 @@ const CreatePage: React.FC = () => {
 
   
   return (
-    <div className="page-container">
-      <>
-        <header className="frosted-glass py-4">
-          <div className="container mx-auto flex justify-between items-center">
-            <Link href="/" className="text-2xl font-serif font-semibold">
-              Neuro-wire
-            </Link>
-            <div>
-              <Link href="/create" className="button primary">
-                Create+
+    <Layout>
+      <div className="page-container">
+          <header className="frosted-glass py-4">
+            <div className="container mx-auto flex justify-between items-center">
+              <Link href="/" className="text-2xl font-serif font-semibold">
+                Neuro-wire
               </Link>
+              <div>
+                <Link href="/create" className="button primary">
+                  Create+
+                </Link>
+              </div>
             </div>
-          </div>
-        </header>
-        <main className="main-content">
-            <BackButton />
-            <div className=" my-8">
-              <h1 className="text-3xl font-bold mb-4">Создать новость</h1>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
-                    Заголовок (макс. 50 символов):
-                  </label>
-                  <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    value={title}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-                    maxLength={50}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
-                </div>
-                <div className="mb-6">
-                  <label htmlFor="content" className="block text-gray-700 text-sm font-bold mb-2">
-                    Содержание:
-                  </label>
-                  <textarea
-                    id="content"
-                    name="content"
-                    value={content}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
-                  />
-                </div>
-                <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Отправить</button>
-                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-              </form>
-            </div>
-        </main>
-        <footer className="frosted-glass py-4 mt-8">
-          <div className="container mx-auto flex justify-between items-center">
-            <p>&copy; 2025 Neuro-wire. Все права защищены.</p>
-            {/* Add social media links here */}
-            <div className="flex space-x-4">
-              <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
-              <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
-              <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
-            </div>
-          </div>
-        </footer>
-      </>
-    </div>
-  );
+          </header>          
+                    
+                <main className="main-content">
+                  <BackButton />
+                  <div className="my-8">
+                    <h1 className="text-3xl font-bold mb-4">Создать новость</h1>
+                    <form onSubmit={handleSubmit}>
+                      <div className="mb-4">
+                        <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
+                          Заголовок (макс. 50 символов):
+                        </label>
+                        <input
+                          type="text"
+                          id="title"
+                          name="title"
+                          value={title}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                          maxLength={50}
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                      </div>
+                      <div className="mb-6">
+                        <label htmlFor="content" className="block text-gray-700 text-sm font-bold mb-2">
+                          Содержание:
+                        </label>
+                        <textarea
+                          id="content"
+                          name="content"
+                          value={content}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
+                        />
+                      </div>
+                      <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Отправить</button>
+                      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+                    </form>
+                  </div>
+                </main>
+              </div>
+            </Layout>
+          );
 };
 
 export default CreatePage;

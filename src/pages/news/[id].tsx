@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { NewsItem } from '../../types/news';
+import { NewsItem } from '../../../types/news';
 import BackButton from '../../components/BackButton';
 import Link from 'next/link';
+import Layout from '../../components/Layout'; // Adjusted path
+
 
 const NewsPage: React.FC = () => {
   const router = useRouter();
@@ -66,7 +68,7 @@ const NewsPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container">
+    <Layout>
       <>
       <header className="frosted-glass py-4">
         <div className="container mx-auto flex justify-between items-center">
@@ -138,19 +140,9 @@ const NewsPage: React.FC = () => {
           <div>Загрузка...</div> 
         )}
       </main>
-      <footer className="frosted-glass py-4 mt-8">
-        <div className="container mx-auto flex justify-between items-center">
-          <p>&copy; 2025 Neuro-wire. Все права защищены.</p>
-          {/* Add social media links here */}
-          <div className="flex space-x-4">
-            <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
-            <a href="#" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
-          </div>
-        </div>
-      </footer>
       </>
-    </div>
+    </Layout>
+
   );
 };
 
