@@ -19,10 +19,10 @@ const NewsList: React.FC<NewsListProps> = ({ news, onVote }) => {
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100">
-            <th className="py-2 px-4 border-b text-left">Title</th>
-            <th className="py-2 px-4 border-b text-right">Rating</th>
-            <th className="py-2 px-4 border-b text-right">Votes</th>
-            <th className="py-2 px-4 border-b text-center">Vote</th>
+            <th className="py-2 px-4 border-b text-left">Заголовок</th>
+            <th className="py-2 px-4 border-b text-right">Рейтинг</th>
+            <th className="py-2 px-4 border-b text-right">Голоса</th>
+            <th className="py-2 px-4 border-b text-center">Голосовать</th>
           </tr>
         </thead>
         <tbody>

@@ -36,6 +36,11 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const clearNews = () => {
+    localStorage.removeItem('news');
+    setNews([]);
+  };
+
   useEffect(() => {
     const storedNews = localStorage.getItem('news');
     setNews(storedNews ? JSON.parse(storedNews) : []);
@@ -52,6 +57,9 @@ const HomePage: React.FC = () => {
             <Link href="/create" className="button primary">
               Create+
             </Link>
+            <button onClick={clearNews} className="button secondary">
+              Очистить новости
+            </button>
           </div>
         </div>
       </header>

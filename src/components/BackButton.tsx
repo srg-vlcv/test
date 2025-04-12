@@ -9,9 +9,9 @@ const BackButton: React.FC = () => {
   };
 
   return (
-    <button className="button secondary" onClick={handleClick}>
-      Back
-    </button>
+      <button className="button secondary" onClick={handleClick}>
+          Назад
+      </button>
   );
 };
 
