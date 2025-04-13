@@ -8,7 +8,17 @@ const HomePage: React.FC = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sortBy, setSortBy] = useState('rating');
+  const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
   const NEWS_PER_PAGE = 5;
+  const fetchNews = () => {
+    const storedNews = localStorage.getItem('news');
+    let initialNews: NewsItem[] = storedNews ? JSON.parse(storedNews) : [];
+    const sortedNews = sortNews(initialNews, sortBy, sortDirection);
+    setNews(sortedNews);
+    setTotalPages(Math.ceil(sortedNews.length / NEWS_PER_PAGE));
+  };
+
 
   const handleVote = (newsItemId: string, voteType: 'like' | 'dislike') => {
     const storedNews = localStorage.getItem('news');
@@ -34,9 +44,9 @@ const HomePage: React.FC = () => {
       updatedNewsItem.votes += 1;
       newsData[newsItemIndex] = updatedNewsItem;
       
-      newsData.sort((a, b) => b.rating - a.rating);
+      newsData = sortNews(newsData, sortBy, sortDirection);
       localStorage.setItem('news', JSON.stringify(newsData));
-      localStorage.setItem(votedKey, 'true');
+      localStorage.setItem(votedKey, 'true');      
       setNews(newsData);
     } else {
       
@@ -49,13 +59,50 @@ const HomePage: React.FC = () => {
     setNews([]);
   };
 
+  const sortNews = (newsArray: NewsItem[], sortBy: string, sortDirection: string): NewsItem[] => {
+    const sortedNews = [...newsArray].sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === 'rating') {
+        comparison = a.rating - b.rating;
+      } else if (sortBy === 'date') {
+        comparison = new Date(a.dateCreated).getTime() - new Date(b.dateCreated).getTime();
+      } else if (sortBy === 'comments') {
+        comparison = (a.comments ? a.comments.length : 0) - (b.comments ? b.comments.length : 0);
+      } else if (sortBy === 'votes') {
+        comparison = a.votes - b.votes;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+    return sortedNews;
+    }
+
+  const handleSortChange = (column: string) => {
+    if (sortBy === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDirection('asc');
+    }
+  };
+
+  useEffect(() => {
+    fetchNews();
+  }, [sortBy, sortDirection]);
+
   useEffect(() => {
     const storedNews = localStorage.getItem('news');
     let initialNews: NewsItem[] = storedNews ? JSON.parse(storedNews) : [];
-    initialNews.sort((a, b) => b.rating - a.rating); // Sort by rating descending
-    setNews(initialNews);
-    setTotalPages(Math.ceil(initialNews.length / NEWS_PER_PAGE));
-  }, []);
+    const sortedNews = sortNews(initialNews, sortBy, sortDirection);
+    setNews(sortedNews);
+    setTotalPages(Math.ceil(sortedNews.length / NEWS_PER_PAGE));
+  }, [sortDirection]);
+
+  useEffect(() => {
+    const storedNews = localStorage.getItem('news');
+    let initialNews: NewsItem[] = storedNews ? JSON.parse(storedNews) : [];
+    const sortedNews = sortNews(initialNews, sortBy, sortDirection);
+    setTotalPages(Math.ceil(sortedNews.length / NEWS_PER_PAGE));
+  }, [news]);
 
   const indexOfLastNews = currentPage * NEWS_PER_PAGE;
   const indexOfFirstNews = indexOfLastNews - NEWS_PER_PAGE;
@@ -124,22 +171,39 @@ const HomePage: React.FC = () => {
           {/* Main Content */}
           <main className="container mx-auto py-8">
             <div className="p-6">
-              <NewsList news={currentNews} onVote={handleVote} />
+              
+
+              
+
+              <NewsList 
+                news={currentNews} 
+                onVote={handleVote}                
+                onSort={handleSortChange}
+                sortBy={sortBy} sortDirection={sortDirection}
+              />
+
               {totalPages > 1 && (
                 <div className="flex justify-center mt-4">
-                  <button onClick={prevPage} disabled={currentPage === 1} className="mx-1 px-3 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50">
+                  <button 
+                    onClick={prevPage} 
+                    disabled={currentPage === 1} 
+                    className="mx-1 px-3 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                  >
                     Previous
                   </button>
+                  
 
                   {renderPageNumbers()}
 
-                  <button onClick={nextPage} disabled={currentPage === totalPages} className="mx-1 px-3 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50">
+                  <button 
+                    onClick={nextPage} 
+                    disabled={currentPage === totalPages} 
+                    className="mx-1 px-3 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                  >
                     Next
                   </button>
                 </div>
               )}
-
-
 
 
             </div>
