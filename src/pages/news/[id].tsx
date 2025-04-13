@@ -17,18 +17,27 @@ const NewsPage: React.FC = () => {
 
   useEffect(() => {
     if (newsId) {
-        const storedNews = localStorage.getItem('news');
-        if (storedNews) {
-            const news: NewsItem[] = JSON.parse(storedNews) as NewsItem[];
-            console.log("Data from localStorage:", news); // Added
-            const item = news.find(n => n.id === newsId);
-            if (item) {
-              setNewsItem(item);
-            } else {
-              setNotFound(true); // Set notFound to true
-            } 
+      const storedNews = localStorage.getItem('news'); // Попытка получить данные из localStorage по ключу 'news'
+      if (storedNews) { // Проверяем, есть ли вообще данные в localStorage
+        try {
+          const news: NewsItem[] = JSON.parse(storedNews) as NewsItem[]; // Пытаемся распарсить строку из localStorage в массив объектов NewsItem
+          // Если данные успешно распарсены, ищем новость с нужным ID
+          console.log("Data from localStorage:", news); // Выводим данные из localStorage в консоль для отладки
+          const item = news.find(n => n.id === newsId); // Ищем новость с нужным ID в массиве
+          if (item) {
+            setNewsItem(item); // Если новость найдена, обновляем состояние newsItem
+          } else {
+            setNotFound(true); // Если новость не найдена, устанавливаем флаг notFound в true
+          }
+        } catch (error) {
+          // Если при парсинге данных из localStorage произошла ошибка (например, если данные повреждены),
+          console.error("Error parsing news from localStorage:", error); // Выводим сообщение об ошибке в консоль
+          setNewsItem(null); // Устанавливаем newsItem в null, так как не удалось получить данные
+          setNotFound(true); // Устанавливаем notFound в true, чтобы отобразить сообщение об ошибке пользователю
         }
-    }  }, [newsId]);
+      } 
+    }
+  }, [newsId]);
 
 
 
