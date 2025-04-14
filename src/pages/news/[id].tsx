@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { NewsItem } from '../../../types/news';
+import { NewsItem } from '../../types/news';
 import BackButton from '../../components/BackButton';
 import Link from 'next/link';
-import Layout from '../../components/Layout'; // Adjusted path
-
+import Layout from '../../components/Layout';
+import { getNews, saveNews } from '../../services/newsService'; // Импорт сервиса
 
 const NewsPage: React.FC = () => {
   const router = useRouter();
@@ -12,68 +12,47 @@ const NewsPage: React.FC = () => {
   const newsId = Array.isArray(id) ? id[0] : id;
   const [newsItem, setNewsItem] = useState<NewsItem | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [hasVoted, setHasVoted] = useState(false);
-  const [userVote, setUserVote] = useState(0);
 
   useEffect(() => {
     if (newsId) {
-      const storedNews = localStorage.getItem('news'); // Попытка получить данные из localStorage по ключу 'news'
-      if (storedNews) { // Проверяем, есть ли вообще данные в localStorage
-        try {
-          const news: NewsItem[] = JSON.parse(storedNews) as NewsItem[]; // Пытаемся распарсить строку из localStorage в массив объектов NewsItem
-          // Если данные успешно распарсены, ищем новость с нужным ID
-          console.log("Data from localStorage:", news); // Выводим данные из localStorage в консоль для отладки
-          const item = news.find(n => n.id === newsId); // Ищем новость с нужным ID в массиве
-          if (item) {
-            setNewsItem(item); // Если новость найдена, обновляем состояние newsItem
-          } else {
-            setNotFound(true); // Если новость не найдена, устанавливаем флаг notFound в true
-          }
-        } catch (error) {
-          // Если при парсинге данных из localStorage произошла ошибка (например, если данные повреждены),
-          console.error("Error parsing news from localStorage:", error); // Выводим сообщение об ошибке в консоль
-          setNewsItem(null); // Устанавливаем newsItem в null, так как не удалось получить данные
-          setNotFound(true); // Устанавливаем notFound в true, чтобы отобразить сообщение об ошибке пользователю
-        }
-      } 
+      const news = getNews(); // Используем сервис
+      const item = news.find(n => n.id === newsId);
+      
+      if (item) {
+        setNewsItem(item);
+      } else {
+        setNotFound(true);
+      }
     }
   }, [newsId]);
 
-
-
-  
   const handleSubmitComment = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const commentText = event.currentTarget.comment.value;
+    const commentText = event.currentTarget.comment.value.trim();
 
-    if (commentText.trim() === '') {
-      alert('Пожалуйста, введите комментарий.');
-      return;
-    }
+    if (!commentText || !newsItem) return;
 
-    const generateId = () => {
-      return `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    };
-
-    const newComment: import('../../types/news').Comment = {
-      id: generateId(),
-      author: 'Placeholder', // Replace with actual author later
+    const newComment = {
+      id: `comment_${Date.now()}`,
+      author: event.currentTarget.author?.value || 'Аноним',
       text: commentText,
     };
 
-    const storedNews = localStorage.getItem('news');
-    if (storedNews) {
-      const news: NewsItem[] = JSON.parse(storedNews) as NewsItem[];
-      const newsIndex = news.findIndex(n => n.id === newsItem.id);
-      if (newsIndex !== -1) {
-        const updatedNewsItem = { ...news[newsIndex], comments: [...(news[newsIndex].comments || []), newComment] };
-        news[newsIndex] = updatedNewsItem;
-        localStorage.setItem('news', JSON.stringify(news));
-        setNewsItem(updatedNewsItem);
-      }
-    }
+    const news = getNews();
+    const newsIndex = news.findIndex(n => n.id === newsItem.id);
+    
+    if (newsIndex === -1) return;
 
-    event.currentTarget.comment.value = ''; // Clear textarea
+    const updatedNewsItem = { 
+      ...news[newsIndex], 
+      comments: [...(news[newsIndex].comments || []), newComment] 
+    };
+
+    news[newsIndex] = updatedNewsItem;
+    saveNews(news); // Сохраняем через сервис
+    
+    setNewsItem(updatedNewsItem);
+    event.currentTarget.comment.value = '';
   };
 
   return (

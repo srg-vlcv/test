@@ -3,6 +3,8 @@ import { NextRouter, useRouter } from 'next/router';
 import Link from "next/link";
 import BackButton from '../components/BackButton';
 import Layout from '../components/Layout';
+import { getNews, saveNews } from '../services/newsService';
+
 
 const CreatePage: React.FC = () => {
   const [title, setTitle] = useState('');
@@ -41,10 +43,9 @@ const CreatePage: React.FC = () => {
           comments: [],
         };
 
-        const existingNews = localStorage.getItem('news');
-        const news = existingNews ? JSON.parse(existingNews) : [];
+        const news = getNews(); // <-- Используем сервис
         news.push(newNews);
-        localStorage.setItem('news', JSON.stringify(news));
+        saveNews(news); // <-- Сохраняем через сервис 
 
         router.push('/');
     }   

@@ -3,13 +3,14 @@ import Layout from '../components/Layout';
 import Link from "next/link";
 import NewsList from "../components/NewsList";
 import { NewsItem } from "../types/news";
+import { getNews } from '../services/newsService';
 
 const HomePage: React.FC = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [sortBy, setSortBy] = useState('rating');
-  const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
+  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
   const NEWS_PER_PAGE = 5;
   const fetchNews = () => {
     const storedNews = localStorage.getItem('news');
@@ -90,8 +91,8 @@ const HomePage: React.FC = () => {
   }, [sortBy, sortDirection]);
 
   useEffect(() => {
-    const storedNews = localStorage.getItem('news');
-    let initialNews: NewsItem[] = storedNews ? JSON.parse(storedNews) : [];
+    
+    const initialNews = getNews(); // <-- Используем сервис
     const sortedNews = sortNews(initialNews, sortBy, sortDirection);
     setNews(sortedNews);
     setTotalPages(Math.ceil(sortedNews.length / NEWS_PER_PAGE));
