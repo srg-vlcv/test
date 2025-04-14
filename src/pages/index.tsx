@@ -101,22 +101,6 @@ const HomePage: React.FC = () => {
     <Layout>
       <div className="min-h-screen">
         <div className="page-container">
-          <header className="frosted-glass py-4">
-            <div className="container mx-auto flex justify-between items-center">
-              <Link href="/" className="text-2xl font-serif font-semibold">
-                Neuro-wire
-              </Link>
-              <div>
-                <Link href="/create" className="button primary">
-                  Create+
-                </Link>
-                <button onClick={clearNews} className="button secondary ml-2">
-                  Очистить новости
-                </button>
-              </div>
-            </div>
-          </header>
-
           <main className="container mx-auto py-8">
             <div className="p-6">
               <NewsList 

@@ -58,18 +58,6 @@ const NewsPage: React.FC = () => {
   return (
     <Layout>
       <>
-      <header className="frosted-glass py-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-2xl font-serif font-semibold">
-            Neuro-wire
-          </Link>
-          <div className="">
-            <Link href="/create" className="button primary">
-              Create+
-            </Link>
-          </div>
-        </div>
-      </header>
       <main className="main-content">
         <BackButton />
         {notFound ? (

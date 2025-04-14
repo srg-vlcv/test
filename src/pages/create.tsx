@@ -5,7 +5,7 @@ import BackButton from '../components/BackButton';
 import Layout from '../components/Layout';
 import { getNews, saveNews } from '../services/newsService';
 
-const [contentLength, setContentLength] = useState(0);
+
 const CreatePage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -63,18 +63,7 @@ const CreatePage: React.FC = () => {
   return (
     <Layout>
       <div className="page-container">
-          <header className="frosted-glass py-4">
-            <div className="container mx-auto flex justify-between items-center">
-              <Link href="/" className="text-2xl font-serif font-semibold">
-                Neuro-wire
-              </Link>
-              <div>
-                <Link href="/create" className="button primary">
-                  Create+
-                </Link>
-              </div>
-            </div>
-          </header>          
+                    
                     
                 <main className="main-content">
                   <BackButton />
