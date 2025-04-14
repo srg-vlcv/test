@@ -6,16 +6,12 @@ import { getNews, saveNews } from '../services/newsService';
 export const useNews = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
 
-  // Загрузка новостей при монтировании компонента
+  // Загрузка новостей при монтировании
   useEffect(() => {
-    const loadNews = () => {
-      const data = getNews();
-      setNews(data);
-    };
-    loadNews();
+    setNews(getNews());
   }, []);
 
-  // Обработка голосования
+  // Логика голосования
   const handleVote = (newsItemId: string, voteType: 'like' | 'dislike') => {
     const updatedNews = news.map((item) => {
       if (item.id === newsItemId) {
@@ -32,7 +28,7 @@ export const useNews = () => {
     });
 
     setNews(updatedNews);
-    saveNews(updatedNews); // Сохраняем изменения через сервис
+    saveNews(updatedNews);
   };
 
   return { news, handleVote };
