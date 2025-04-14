@@ -11,6 +11,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.74.0",
     "@testing-library/react": "^16.3.0",
+    "@yandex/smart-captcha": "2.7.1",
     "autoprefixer": "^10.4.21",
     "dompurify": "^3.2.5",
     "markdown-it": "^14.1.0",
