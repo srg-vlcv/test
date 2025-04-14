@@ -97,6 +97,7 @@ const NewsPage: React.FC = () => {
                   <textarea
                     id="comment"
                     name="comment"
+                    maxLength={500}
                     placeholder="Напишите свой комментарий..."
                     className="w-full h-24 p-2 border rounded"
                     required

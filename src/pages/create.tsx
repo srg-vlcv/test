@@ -5,7 +5,7 @@ import BackButton from '../components/BackButton';
 import Layout from '../components/Layout';
 import { getNews, saveNews } from '../services/newsService';
 
-
+const [contentLength, setContentLength] = useState(0);
 const CreatePage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -26,12 +26,20 @@ const CreatePage: React.FC = () => {
       setError('Пожалуйста, введите заголовок и содержание.');
       return;
     } 
+    
     if (title.trim() === '') {
       setError('Пожалуйста, введите заголовок.');
     } else if (content.trim() === '') {
       setError('Пожалуйста, введите содержание.');
     } else { // No errors, proceed with saving
         setError(''); // Clear any existing error message
+        
+        // Проверка максимальной длины
+        if (content.length > 1000) {
+          setError('Содержание не должно превышать 1000 символов.');
+          return;
+        }
+
         const newsId = generateId();
         const newNews = {
           id: newsId,
@@ -94,6 +102,7 @@ const CreatePage: React.FC = () => {
                         <textarea
                           id="content"
                           name="content"
+                          maxLength={1001} // Добавляем ограничение
                           value={content}
                           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
                           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
