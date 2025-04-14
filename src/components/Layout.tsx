@@ -26,7 +26,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               className="text-gray-600 hover:text-gray-800 transition-colors"
               aria-label="Dzen"
             >
-              <DzenIcon className="w-8 h-8" />
+              <DzenIcon className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10" />
+
             </a>
             <a 
               href="https://vk.com/neurowire" 
@@ -35,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               className="text-gray-600 hover:text-gray-800 transition-colors"
               aria-label="VK"
             >
-              <VKIcon className="w-8 h-8" />
+              <VKIcon className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10" />
             </a>
             <a 
               href="https://t.me/neurowire" 
@@ -44,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               className="text-gray-600 hover:text-gray-800 transition-colors"
               aria-label="Telegram"
             >
-              <TelegramIcon className="w-8 h-8" />
+              <TelegramIcon className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10" />
             </a>
           </div>
         </div>
