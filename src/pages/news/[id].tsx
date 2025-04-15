@@ -38,7 +38,7 @@ const NewsPage: React.FC = () => {
             <p className="mt-4">Рейтинг: {newsItem.rating}</p>
 
             <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4">Комментарии</h2>
+              <h2 className="text-2xl font-bold mb-4 mx-2">Комментарии</h2>
               <CommentForm />
             </div>
           </>

@@ -1,47 +1,64 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { SmartCaptcha } from '@yandex/smart-captcha';
 import { icons } from './icons';
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill/dist/quill.snow.css'; // обязательно импортируем стили Quill
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface Comment {
   id: number;
   name: string;
-  email?: string;
+  email: string;
   content: string;
   date: string;
   iconIndex: number;
 }
 
-const CommentForm: React.FC = () => {
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [content, setContent] = useState<string>('');
+export default function CommentForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [content, setContent] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
-  const [captchaToken, setCaptchaToken] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [error, setError] = useState('');
+  const isFirstSave = useRef(true);
 
-  // Загрузка из localStorage
+  // Загрузка комментариев и флага капчи
   useEffect(() => {
-    const saved = localStorage.getItem('comments');
-    if (saved) setComments(JSON.parse(saved));
+    const savedComments = window.localStorage.getItem('comments');
+    if (savedComments) {
+      try { setComments(JSON.parse(savedComments)); } catch {}
+    }
+    if (window.localStorage.getItem('captchaPassed') === 'true') {
+      setCaptchaVerified(true);
+    }
   }, []);
 
-  // Сохранение в localStorage
+  // Сохранение комментариев (пропускаем первый рендер)
   useEffect(() => {
-    localStorage.setItem('comments', JSON.stringify(comments));
+    if (isFirstSave.current) {
+      isFirstSave.current = false;
+      return;
+    }
+    window.localStorage.setItem('comments', JSON.stringify(comments));
   }, [comments]);
-  const [captchaKey, setCaptchaKey] = useState(Date.now());
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!name.trim())    return setError('Пожалуйста, введите имя');
     if (!content.trim()) return setError('Пожалуйста, введите текст комментария');
-    if (!captchaToken)   return setError('Пожалуйста, пройдите проверку каптчи');
+    if (!captchaVerified && !captchaToken) {
+      return setError('Пожалуйста, пройдите проверку каптчи');
+    }
+    if (!captchaVerified && captchaToken) {
+      window.localStorage.setItem('captchaPassed', 'true');
+      setCaptchaVerified(true);
+    }
 
     const iconIndex = Math.floor(Math.random() * icons.length);
     const newComment: Comment = {
@@ -55,107 +72,89 @@ const CommentForm: React.FC = () => {
     setComments(prev => [newComment, ...prev]);
     setContent('');
     setCaptchaToken('');
-    setCaptchaKey(Date.now()); // пересоздаёт компонент
-
-    
   };
 
   return (
-    
-      <div className="flex items-start gap-4">
-        
-        
-
-        {/* Карточка формы */}
-        <div className="flex-1 bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Header */}
-          <div className="px-4 py-2 border-b font-semibold">
-            Гость, оставьте комментарий?
+    <div className="mx-4">
+      <form onSubmit={handleSubmit} onChange={() => setError('')}>
+        {/* Поля Имя и E-Mail */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="comment-name" className="block text-sm font-medium">
+              Имя:<span className="text-red-500">*</span>
+            </label>
+            <input
+              id="comment-name"
+              type="text"
+              className="mt-1 w-full border rounded px-2 py-1"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
           </div>
-
-          {/* Форма */}
-          <form onSubmit={handleSubmit} onChange={() => setError('')}>
-            <div className="px-4 py-3 space-y-4">
-              {/* Имя и E‑mail */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="comment-name" className="block text-sm">
-                    Имя:<span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="comment-name"
-                    type="text"
-                    className="w-full border rounded px-2 py-1"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="comment-email" className="block text-sm">
-                    E‑Mail:
-                  </label>
-                  <input
-                    id="comment-email"
-                    type="email"
-                    className="w-full border rounded px-2 py-1"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* WYSIWYG‑редактор */}
-              <div className="border rounded">
-                <ReactQuill
-                  theme="snow"
-                  value={content}
-                  onChange={setContent}
-                  placeholder="Ваш комментарий..."
-                  style={{ minHeight: '180px' }}
-                />
-              </div>
-
-              {/* Яндекс‑капча */}
-              <SmartCaptcha
-                key={captchaKey}
-                sitekey="ysc1_YlpBL0WYgRXgSCI2gjm27vUgZ2ll69ea0BUZK7DR96d0f581"
-                onSuccess={token => setCaptchaToken(token)}
-
-              />
-
-              {/* Ошибка валидации */}
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-            </div>
-
-            {/* Footer формы */}
-            <div className="bg-gray-50 border-t px-4 py-3 text-right">
-              <button
-                type="submit"
-                className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
-              >
-                Отправить
-              </button>
-            </div>
-          </form>
+          <div>
+            <label htmlFor="comment-email" className="block text-sm font-medium">
+              E‑Mail:
+            </label>
+            <input
+              id="comment-email"
+              type="email"
+              className="mt-1 w-full border rounded px-2 py-1"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
         </div>
-      
+
+        {/* Редактор */}
+        <div className="border rounded mb-4">
+          <ReactQuill
+            theme="snow"
+            value={content}
+            onChange={setContent}
+            placeholder="Ваш комментарий..."
+            style={{ minHeight: '180px' }}
+          />
+        </div>
+
+        {/* Капча */}
+        {!captchaVerified && (
+          <div className="mb-4">
+            <SmartCaptcha
+              sitekey="ysc1_YlpBL0WYgRXgSCI2gjm27vUgZ2ll69ea0BUZK7DR96d0f581"
+              onSuccess={token => setCaptchaToken(token)}
+            />
+          </div>
+        )}
+
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+        <div className="text-right mb-8">
+          <button
+            type="submit"
+            className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+          >
+            Отправить
+          </button>
+        </div>
+      </form>
 
       {/* Список комментариев */}
-      <ul className="mt-6 space-y-4">
+      <ul className="space-y-4">
         {comments.map(c => {
           const Icon = icons[c.iconIndex];
           return (
             <li key={c.id} className="flex items-start gap-4">
               <Icon className="w-12 h-12 flex-shrink-0" />
-              <div className="bg-white rounded-2xl shadow-lg p-3 flex-1">
+              <div className="bg-white rounded-2xl shadow p-3 flex-1">
                 <div className="text-sm font-semibold">
                   {c.name}{' '}
                   <span className="text-xs text-gray-500">
                     {new Date(c.date).toLocaleString()}
                   </span>
                 </div>
+                {/* Оборачиваем HTML в контейнер с классом ql-editor для корректных стилей */}
                 <div
-                  className="mt-2 prose"
+                  className="mt-2 ql-editor ql-snow"
                   dangerouslySetInnerHTML={{ __html: c.content }}
                 />
               </div>
@@ -165,6 +164,4 @@ const CommentForm: React.FC = () => {
       </ul>
     </div>
   );
-};
-
-export default CommentForm;
+}
