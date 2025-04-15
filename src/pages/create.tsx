@@ -1,12 +1,17 @@
+'use client';
+
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
-import Link from "next/link";
-import BackButton from '../components/BackButton';
+import Link from 'next/link';
+//import BackButton from '../components/BackButton';
 import Layout from '../components/Layout';
 import { getNews, saveNews } from '../services/newsService';
+import 'react-quill/dist/quill.snow.css';
 
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-const CreatePage: React.FC = () => {
+export default function CreatePage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
@@ -19,92 +24,87 @@ const CreatePage: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError('');
 
-    setError(''); // Clear previous errors
-
-    if (title.trim() === '' && content.trim() === '') {
-      setError('Пожалуйста, введите заголовок и содержание.');
-      return;
-    } 
-    
-    if (title.trim() === '') {
+    if (!title.trim()) {
       setError('Пожалуйста, введите заголовок.');
-    } else if (content.trim() === '') {
+      return;
+    }
+    if (!content.trim()) {
       setError('Пожалуйста, введите содержание.');
-    } else { // No errors, proceed with saving
-        setError(''); // Clear any existing error message
-        
-        // Проверка максимальной длины
-        if (content.length > 1000) {
-          setError('Содержание не должно превышать 1000 символов.');
-          return;
-        }
+      return;
+    }
 
-        const newsId = generateId();
-        const newNews = {
-          id: newsId,
-          title: title,
-          content: content,
-          dateCreated: new Date().toISOString(),
-          rating: 0,
-          votes: 0,
-          comments: [],
-        };
+    // По желанию можно ограничить длину HTML-строки
+    if (content.length > 5000) {
+      setError('Содержание не должно превышать 5000 символов.');
+      return;
+    }
 
-        const news = getNews(); // <-- Используем сервис
-        news.push(newNews);
-        saveNews(news); // <-- Сохраняем через сервис 
+    const newsId = generateId();
+    const newNews = {
+      id: newsId,
+      title: title.trim(),
+      content, // здесь хранится HTML
+      dateCreated: new Date().toISOString(),
+      rating: 0,
+      votes: 0,
+      comments: [],
+    };
 
-        router.push('/');
-    }   
+    const newsList = getNews();
+    newsList.push(newNews);
+    saveNews(newsList);
+
+    router.push('/');
   };
 
-  
   return (
     <Layout>
       <div className="page-container">
-                    
-                    
-                <main className="main-content">
-                  <BackButton />
-                  <div className="my-8">
-                    <h1 className="text-3xl font-bold mb-4">Создать новость</h1>
-                    <form onSubmit={handleSubmit}>
-                      <div className="mb-4">
-                        <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">
-                          Заголовок (макс. 50 символов):
-                        </label>
-                        <input
-                          type="text"
-                          id="title"
-                          name="title"
-                          value={title}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-                          maxLength={50}
-                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        />
-                      </div>
-                      <div className="mb-6">
-                        <label htmlFor="content" className="block text-gray-700 text-sm font-bold mb-2">
-                          Содержание:
-                        </label>
-                        <textarea
-                          id="content"
-                          name="content"
-                          maxLength={1001} // Добавляем ограничение
-                          value={content}
-                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
-                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
-                        />
-                      </div>
-                      <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Отправить</button>
-                      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-                    </form>
-                  </div>
-                </main>
+        <main className="main-content">
+          <div className="my-4 mx-auto p-4 bg-white rounded shadow">
+            <h1 className="text-3xl font-bold mb-4">Создать новость</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium mb-1">
+                  Заголовок (макс. 50 символов):
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  maxLength={50}
+                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                />
               </div>
-            </Layout>
-          );
-};
-
-export default CreatePage;
+              <div>
+                <label htmlFor="content" className="block text-sm font-medium mb-1">
+                  Содержание:
+                </label>
+                <div className="border rounded">
+                  <ReactQuill
+                    theme="snow"
+                    value={content}
+                    onChange={setContent}
+                    placeholder="Введите текст новости..."
+                    style={{ minHeight: '300px' }}
+                  />
+                </div>
+              </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
+              >
+                Отправить
+              </button>
+            </form>
+          </div>
+        </main>
+      </div>
+    </Layout>
+  );
+}

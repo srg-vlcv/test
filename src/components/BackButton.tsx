@@ -1,18 +1,15 @@
-import { useRouter } from 'next/router';
+/* Кнопка «Назад» всегда под шапкой, перед контентом 
 import React from 'react';
 
 const BackButton: React.FC = () => {
   const router = useRouter();
-
-  const handleClick = () => {
-    router.back();
-  };
-
   return (
-      <button className="button secondary" onClick={handleClick}>
-          Назад
-      </button>
+    <button
+      onClick={() => router.back()}
+    >
+      Взад
+    </button>
   );
 };
 
-export default BackButton;
+export default BackButton;*/

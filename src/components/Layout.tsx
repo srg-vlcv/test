@@ -1,25 +1,43 @@
 import React, { ReactNode } from 'react';
-import Link from 'next/link';
+//import Link from 'next/link';
 import { VKIcon } from '../components/icons/VKIcon';
 import { TelegramIcon } from '../components/icons/TelegramIcon';
 import { DzenIcon } from '../components/icons/DzenIcon';
 import AppHeader from './AppHeader'; // Импорт нового компонента
+import { useRouter } from 'next/router';
+
 
 interface LayoutProps {
   children: ReactNode;
 }
+const BackButton: React.FC = () => {
+  const router = useRouter();
+  return (
+    <button
+      onClick={() => router.back()}
+    >
+      Взад
+    </button>
+  );
+};
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
+    
     <div className="min-h-screen bg-gray-100">
       {/* Добавляем шапку здесь */}
       <AppHeader />
       
+      <div className="page-container mx-4 mb-4">
+        {/* Кнопка «Назад» всегда под шапкой, перед контентом */}
+        <BackButton />
+        </div>
       <main className="container mx-auto py-8">
         {children}
       </main>
-
+      
       {/* Футер остаётся без изменений */}
+      
       <footer className="frosted-glass py-4 mt-8">
         <div className="container mx-auto flex justify-between items-center">
           <p>&copy; 2025 Neuro-wire. All rights reserved.</p>
@@ -53,9 +71,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </a>
           </div>
         </div>
+        
       </footer>
     </div>
+    
   );
 };
+
 
 export default Layout;

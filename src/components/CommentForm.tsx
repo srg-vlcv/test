@@ -120,7 +120,7 @@ export default function CommentForm() {
         {!captchaVerified && (
           <div className="mb-4">
             <SmartCaptcha
-              sitekey="ysc1_YlpBL0WYgRXgSCI2gjm27vUgZ2ll69ea0BUZK7DR96d0f581"
+              sitekey="ваш_ключ_Yandex"
               onSuccess={token => setCaptchaToken(token)}
             />
           </div>
@@ -144,7 +144,7 @@ export default function CommentForm() {
           const Icon = icons[c.iconIndex];
           return (
             <li key={c.id} className="flex items-start gap-4">
-              <Icon className="w-12 h-12 flex-shrink-0" />
+              <Icon SizeSVG="w-12 h-12 flex-shrink-0" />
               <div className="bg-white rounded-2xl shadow p-3 flex-1">
                 <div className="text-sm font-semibold">
                   {c.name}{' '}
