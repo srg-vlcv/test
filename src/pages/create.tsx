@@ -6,7 +6,7 @@ import { NextRouter, useRouter } from 'next/router';
 import Link from 'next/link';
 //import BackButton from '../components/BackButton';
 import Layout from '../components/Layout';
-import { getNews, saveNews } from '../services/newsService';
+//import { getNews, saveNews } from '../services/newsService';
 import 'react-quill/dist/quill.snow.css';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -22,41 +22,15 @@ export default function CreatePage() {
     return `news_text_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError('');
-
-    if (!title.trim()) {
-      setError('Пожалуйста, введите заголовок.');
-      return;
-    }
-    if (!content.trim()) {
-      setError('Пожалуйста, введите содержание.');
-      return;
-    }
-
-    // По желанию можно ограничить длину HTML-строки
-    if (content.length > 5000) {
-      setError('Содержание не должно превышать 5000 символов.');
-      return;
-    }
-
-    const newsId = generateId();
-    const newNews = {
-      id: newsId,
-      title: title.trim(),
-      content, // здесь хранится HTML
-      dateCreated: new Date().toISOString(),
-      rating: 0,
-      votes: 0,
-      comments: [],
-    };
-
-    const newsList = getNews();
-    newsList.push(newNews);
-    saveNews(newsList);
-
-    router.push('/');
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    const res = await fetch('/api/news', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ title, content }),
+    });
+    const newItem = await res.json();
+    router.push(`/news/${newItem.id}`);
   };
 
   return (

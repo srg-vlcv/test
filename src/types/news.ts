@@ -12,4 +12,5 @@ export interface Comment {
   id: string;
   author: string;
   text: string;
+  dateCreated: string; // ← добавь это
 }

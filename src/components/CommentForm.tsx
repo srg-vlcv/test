@@ -4,20 +4,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { SmartCaptcha } from '@yandex/smart-captcha';
 import { icons } from './icons';
-import 'react-quill/dist/quill.snow.css'; // обязательно импортируем стили Quill
+import 'react-quill/dist/quill.snow.css';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
+interface Props {
+  newsId: string;
+  onCommentAdded?: () => void;
+}
+
 interface Comment {
-  id: number;
-  name: string;
-  email: string;
-  content: string;
-  date: string;
+  id: string;
+  author: string;
+  text: string;
+  dateCreated: string;
   iconIndex: number;
 }
 
-export default function CommentForm() {
+export default function CommentForm({ newsId, onCommentAdded }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [content, setContent] = useState('');
@@ -25,59 +29,79 @@ export default function CommentForm() {
   const [captchaToken, setCaptchaToken] = useState('');
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [error, setError] = useState('');
-  const isFirstSave = useRef(true);
+  const isFirstLoad = useRef(true);
 
-  // Загрузка комментариев и флага капчи
+  // Загружаем существующие комментарии
   useEffect(() => {
-    const savedComments = window.localStorage.getItem('comments');
-    if (savedComments) {
-      try { setComments(JSON.parse(savedComments)); } catch {}
-    }
+    if (!newsId) return;
+    fetch(`/api/news/${newsId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data.comments)) {
+          setComments(
+            data.comments.map((c: any) => ({
+              ...c,
+              iconIndex: Math.floor(Math.random() * icons.length),
+            }))
+          );
+        }
+      });
+  }, [newsId]);
+
+  // Проверяем, прошёл ли пользователь капчу ранее
+  useEffect(() => {
     if (window.localStorage.getItem('captchaPassed') === 'true') {
       setCaptchaVerified(true);
     }
   }, []);
 
-  // Сохранение комментариев (пропускаем первый рендер)
-  useEffect(() => {
-    if (isFirstSave.current) {
-      isFirstSave.current = false;
-      return;
-    }
-    window.localStorage.setItem('comments', JSON.stringify(comments));
-  }, [comments]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!name.trim())    return setError('Пожалуйста, введите имя');
+
+    if (!name.trim()) return setError('Пожалуйста, введите имя');
     if (!content.trim()) return setError('Пожалуйста, введите текст комментария');
     if (!captchaVerified && !captchaToken) {
       return setError('Пожалуйста, пройдите проверку каптчи');
     }
+
+    // После первого прохождения сохраняем капчу
     if (!captchaVerified && captchaToken) {
       window.localStorage.setItem('captchaPassed', 'true');
       setCaptchaVerified(true);
     }
 
-    const iconIndex = Math.floor(Math.random() * icons.length);
-    const newComment: Comment = {
-      id: Date.now(),
-      name,
-      email,
-      content,
-      date: new Date().toISOString(),
-      iconIndex,
-    };
-    setComments(prev => [newComment, ...prev]);
-    setContent('');
-    setCaptchaToken('');
+    try {
+      await fetch(`/api/news/${newsId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ author: name, text: content }),
+      });
+
+      // Перезапрашиваем свежие комментарии
+      const updated = await fetch(`/api/news/${newsId}`).then(r => r.json());
+
+      setComments(
+        updated.comments.map((c: any) => ({
+          ...c,
+          iconIndex: Math.floor(Math.random() * icons.length),
+        }))
+      );
+
+      // Сброс формы
+      setContent('');
+      setCaptchaToken('');
+      if (onCommentAdded) onCommentAdded();
+    } catch (err) {
+      console.error(err);
+      setError('Ошибка при отправке комментария');
+    }
   };
 
   return (
     <div className="mx-4">
       <form onSubmit={handleSubmit} onChange={() => setError('')}>
-        {/* Поля Имя и E-Mail */}
+        {/* Имя и E-Mail */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label htmlFor="comment-name" className="block text-sm font-medium">
@@ -147,15 +171,14 @@ export default function CommentForm() {
               <Icon SizeSVG="w-12 h-12 flex-shrink-0" />
               <div className="bg-white rounded-2xl shadow p-3 flex-1">
                 <div className="text-sm font-semibold">
-                  {c.name}{' '}
+                  {c.author}{' '}
                   <span className="text-xs text-gray-500">
-                    {new Date(c.date).toLocaleString()}
+                    {new Date(c.dateCreated).toLocaleString()}
                   </span>
                 </div>
-                {/* Оборачиваем HTML в контейнер с классом ql-editor для корректных стилей */}
                 <div
                   className="mt-2 ql-editor ql-snow"
-                  dangerouslySetInnerHTML={{ __html: c.content }}
+                  dangerouslySetInnerHTML={{ __html: c.text }}
                 />
               </div>
             </li>

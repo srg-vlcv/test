@@ -1,33 +1,82 @@
 // src/services/newsService.ts
+import db from '../../lib/database';
 import { NewsItem, Comment } from '../types/news';
 
-// Получить все новости из localStorage
-export const getNews = (): NewsItem[] => {
+
+// 1) Получить список новостей (без комментариев)
+
+export function getNews(): NewsItem[] {
   try {
-    const storedNews = localStorage.getItem('news');
-    return storedNews ? JSON.parse(storedNews) : [];
+    const rows: any[] = db.prepare(`...`).all();
+    return rows.map(r => ({
+      ...r,
+      comments: [],  // комментарии будем грузить при GET /news/[id]
+    }));
   } catch (error) {
-    console.error('Ошибка чтения новостей:', error);
+    console.error('Ошибка получения новостей:', error);
     return [];
   }
-};
+}
 
-// Сохранить все новости в localStorage
-export const saveNews = (news: NewsItem[]): void => {
-  localStorage.setItem('news', JSON.stringify(news));
-};
+// 2) Создать новость
+export function createNews(item: {
+  title: string;
+  content: string;
+}): NewsItem {
+  const id = `news_${Date.now()}`;
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO News (id, title, content, dateCreated)
+    VALUES (?, ?, ?, ?)
+  `).run(id, item.title, item.content, now);
+  return { id, ...item, dateCreated: now, rating: 0, votes: 0, comments: [] };
+}
 
-// Добавить комментарий к конкретной новости
-export const addComment = (newsId: string, comment: Comment): void => {
-  const news = getNews();
-  const newsItem = news.find((item) => item.id === newsId);
+// 3) Получить одну новость вместе с комментариями
+export function getNewsItem(id: string): NewsItem | null {
+  const r: any = db
+    .prepare('SELECT * FROM News WHERE id = ?')
+    .get(id);
+  if (!r) return null;
 
-  if (!newsItem) {
-    console.error('Новость не найдена');
-    return;
-  }
+  const comments: Comment[] = db
+    .prepare(`
+      SELECT id, author, text, dateCreated
+      FROM Comments
+      WHERE newsId = ?
+      ORDER BY dateCreated DESC
+    `)
+    .all(id)
+    .map((c: any) => ({
+      id: c.id,
+      author: c.author,
+      text: c.text,
+      dateCreated: c.dateCreated,
+    }));
 
-  if (!newsItem.comments) newsItem.comments = [];
-  newsItem.comments.push(comment);
-  saveNews(news);
-};
+  return { 
+    id: r.id,
+    title: r.title,
+    content: r.content,
+    dateCreated: r.dateCreated,
+    rating: r.rating,
+    votes: r.votes,
+    comments
+  };
+}
+
+// 4) Добавить комментарий
+export function addComment(
+  newsId: string,
+  comm: { author: string; text: string }
+): Comment {
+  const newsExists = db.prepare('SELECT id FROM News WHERE id = ?').get(newsId);
+  if (!newsExists) throw new Error('Новость не найдена');
+  const id = `c_${Date.now()}`;
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO Comments (id, newsId, author, text, dateCreated)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(id, newsId, comm.author, comm.text, now);
+  return { id, author: comm.author, text: comm.text, dateCreated: now };
+}
